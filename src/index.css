@@ -1,0 +1,194 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(147, 51, 234, 0.3);
+  border-radius: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(147, 51, 234, 0.5);
+}
+
+/* Background Gradients */
+.tab-content-container {
+  background: linear-gradient(135deg, rgba(17, 24, 39, 0.95), rgba(88, 28, 135, 0.95));
+}
+
+.tab-content-container[data-tab="locations"] {
+  background: linear-gradient(135deg, rgba(17, 24, 39, 0.95), rgba(55, 65, 81, 0.95));
+}
+
+.tab-content-container[data-tab="garden"] {
+  background: linear-gradient(135deg, rgba(17, 24, 39, 0.95), rgba(52, 211, 153, 0.95));
+}
+
+.tab-content-container[data-tab="store"] {
+  background: linear-gradient(135deg, rgba(17, 24, 39, 0.95), rgba(139, 92, 246, 0.95));
+}
+
+.tab-content-container[data-tab="dojo"] {
+  background: linear-gradient(135deg, rgba(17, 24, 39, 0.95), rgba(167, 139, 250, 0.95));
+}
+
+.tab-content-container[data-tab="projects"] {
+  background: linear-gradient(135deg, rgba(17, 24, 39, 0.95), rgba(79, 70, 229, 0.95));
+}
+
+.tab-content-container[data-tab="wallet"] {
+  background: linear-gradient(135deg, rgba(17, 24, 39, 0.95), rgba(76, 29, 149, 0.95));
+}
+
+@layer components {
+  /* Glass Button Style */
+  .glass-button {
+    @apply px-4 py-2 rounded-lg bg-black/20 border border-emerald-500/20 backdrop-blur-sm 
+           transition-all duration-300 hover:border-emerald-500/40 relative overflow-hidden;
+  }
+
+  .glass-button::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/10 to-emerald-500/0
+           transform -translate-x-full hover:translate-x-full transition-transform duration-1000;
+  }
+
+  /* Card Styles */
+  .project-card {
+    @apply bg-black/20 rounded-xl border border-emerald-500/20 backdrop-blur-sm 
+           transition-all duration-300 hover:border-emerald-500/40 hover:shadow-lg 
+           hover:shadow-emerald-500/20 overflow-hidden;
+  }
+
+  .eco-card {
+    @apply bg-black/20 rounded-xl border border-emerald-500/20 backdrop-blur-sm 
+           transition-all duration-300 hover:border-emerald-500/40;
+  }
+
+  .dojo-card {
+    @apply bg-black/20 rounded-xl border border-emerald-500/20 backdrop-blur-sm p-6
+           transition-all duration-300 hover:border-emerald-500/40;
+  }
+
+  /* Modal Styles */
+  .modal-backdrop {
+    @apply fixed inset-0 bg-black/80 backdrop-blur-sm z-40;
+  }
+
+  .modal-content {
+    @apply fixed inset-0 flex items-center justify-center p-4 z-50;
+  }
+
+  .mobile-menu {
+    @apply fixed inset-y-0 right-0 w-64 bg-gray-900/95 backdrop-blur-sm transform 
+           transition-transform duration-300 z-50 overflow-y-auto;
+  }
+
+  /* Fade Background Elements */
+  .modal-open .fade-background {
+    @apply opacity-30 pointer-events-none transition-opacity duration-300;
+  }
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  .glass-button {
+    @apply px-3 py-2 text-sm;
+  }
+
+  .project-card {
+    @apply transform-none hover:transform-none;
+  }
+
+  .eco-card {
+    @apply hover:transform-none;
+  }
+
+  .dojo-card {
+    @apply p-4;
+  }
+
+  .modal-content {
+    @apply p-2;
+  }
+}
+
+/* Animation Keyframes */
+@keyframes particle {
+  to {
+    transform: translate(var(--x), var(--y)) rotate(var(--rotation)) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes emoji-burst {
+  to {
+    transform: translate(var(--x), var(--y)) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes water-splash {
+  to {
+    transform: translate(var(--x), var(--y)) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Title Effect */
+.title-effect {
+  text-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+}
+
+/* Points Display Particles */
+.points-particles::before {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/10 to-emerald-500/0
+         transform -translate-x-full hover:translate-x-full transition-transform duration-1000;
+}
+
+/* Safe Area Handling */
+@supports(padding: max(0px)) {
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  
+  .safe-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+}
+
+/* Modal Open State */
+.modal-open {
+  @apply overflow-hidden fixed inset-0;
+  width: 100%;
+  height: 100%;
+}

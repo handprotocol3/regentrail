@@ -1,0 +1,252 @@
+import React, { useState, useEffect } from 'react';
+import { Toaster } from 'sonner';
+import { Sprout, Map, Store as StoreIcon, Terminal, Wallet, Dumbbell, Heart, Calendar, Cookie, Menu, X } from 'lucide-react';
+import { LocationsTab } from './components/tabs/LocationsTab';
+import { StoreTab } from './components/tabs/StoreTab';
+import { GardenTab } from './components/tabs/GardenTab';
+import { DojoTab } from './components/tabs/DojoTab';
+import { WalletTab } from './components/tabs/WalletTab';
+import { ProjectsTab } from './components/tabs/ProjectsTab';
+import { EventsTab } from './components/tabs/EventsTab';
+import { CookieJarTab } from './components/tabs/CookieJarTab';
+import { ConsoleLog } from './components/ConsoleLog';
+import { PointsDisplay } from './components/PointsDisplay';
+import { CookieJar } from './components/CookieJar';
+import { ConnectWallet } from './components/ConnectWallet';
+import { QuadraticStream } from './components/QuadraticStream';
+import { GreenPillIntro } from './components/GreenPillIntro';
+import { Leaderboard } from './components/Leaderboard';
+import { UserSetup } from './components/UserSetup';
+import { useGameStore } from './store/gameStore';
+import { useUserStore } from './store/userStore';
+
+const tabs = [
+  { id: 'locations', label: 'Locations', icon: Map },
+  { id: 'events', label: 'Events', icon: Calendar },
+  { id: 'garden', label: 'Garden', icon: Sprout },
+  { id: 'store', label: 'Store', icon: StoreIcon },
+  { id: 'dojo', label: 'Dojo', icon: Dumbbell },
+  { id: 'projects', label: 'Projects', icon: Heart },
+  { id: 'cookiejar', label: 'CookieJar', icon: Cookie },
+  { id: 'wallet', label: 'Wallet', icon: Wallet }
+];
+
+const App: React.FC = () => {
+  const [activeTab, setActiveTab] = useState('locations');
+  const [showIntro, setShowIntro] = useState(true);
+  const [showUserSetup, setShowUserSetup] = useState(true);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const logs = useGameStore((state) => state.logs);
+  const [showProposalModal, setShowProposalModal] = useState(false);
+  const { addUser } = useUserStore();
+
+  useEffect(() => {
+    if (showMobileMenu || showProposalModal) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, [showMobileMenu, showProposalModal]);
+
+  const handleTabChange = async (tabId: string) => {
+    if (!document.startViewTransition) {
+      setActiveTab(tabId);
+      setShowMobileMenu(false);
+      return;
+    }
+
+    await document.startViewTransition(() => {
+      setActiveTab(tabId);
+      setShowMobileMenu(false);
+    }).finished;
+  };
+
+  const handleUserSetupComplete = (username: string | null) => {
+    addUser(username);
+    setShowUserSetup(false);
+  };
+
+  if (showIntro) {
+    return <GreenPillIntro onStart={() => setShowIntro(false)} />;
+  }
+
+  if (showUserSetup) {
+    return <UserSetup onComplete={handleUserSetupComplete} />;
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-r from-emerald-950 via-emerald-900 to-purple-900 text-white">
+      <Toaster 
+        position="top-right" 
+        closeButton
+        theme="dark"
+        toastOptions={{
+          style: {
+            background: 'rgba(0, 0, 0, 0.8)',
+            color: '#fff',
+            border: '1px solid rgba(74, 222, 128, 0.2)'
+          }
+        }}
+      />
+      <QuadraticStream />
+
+      {/* Mobile Header */}
+      <div className="sticky top-0 z-20 bg-gray-900/95 backdrop-blur-sm border-b border-emerald-500/20 p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-emerald-400">Regen Trail</h1>
+            <p className="text-xs text-gray-400 italic">A HAND Experience</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <ConnectWallet />
+            <button
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="md:hidden p-2 hover:bg-emerald-500/10 rounded-lg transition-colors"
+            >
+              {showMobileMenu ? (
+                <X className="text-emerald-400" size={24} />
+              ) : (
+                <Menu className="text-emerald-400" size={24} />
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop Navigation */}
+      <div className="hidden md:flex flex-wrap gap-2 p-4">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => handleTabChange(tab.id)}
+              className={`glass-button flex items-center gap-2 transition-all duration-300 ${
+                activeTab === tab.id
+                  ? 'bg-emerald-500/20 border-emerald-500/30'
+                  : 'hover:bg-emerald-500/10'
+              }`}
+            >
+              <Icon size={18} />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Main Content */}
+      <div className="p-4">
+        <div className="max-w-6xl mx-auto space-y-8">
+          <div className="grid md:grid-cols-[1fr,300px] gap-8">
+            <div className="space-y-8" style={{ viewTransitionName: 'tab-content' }}>
+              {activeTab === 'locations' && <LocationsTab />}
+              {activeTab === 'events' && <EventsTab />}
+              {activeTab === 'garden' && <GardenTab />}
+              {activeTab === 'store' && <StoreTab />}
+              {activeTab === 'dojo' && <DojoTab />}
+              {activeTab === 'projects' && <ProjectsTab />}
+              {activeTab === 'cookiejar' && <CookieJarTab />}
+              {activeTab === 'wallet' && <WalletTab />}
+            </div>
+
+            <div className="space-y-8 fade-background">
+              <PointsDisplay />
+              <CookieJar />
+              <ConsoleLog logs={logs} onProposalClick={() => setShowProposalModal(true)} />
+              <Leaderboard />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="fixed bottom-4 right-4 text-xs text-gray-500 italic">
+        Disclaimer: This is meant to be educational and fun. Have you taken the green pill? 🌱
+      </div>
+
+      {/* Modals */}
+      {(showMobileMenu || showProposalModal) && (
+        <div 
+          className="modal-backdrop"
+          onClick={() => {
+            setShowMobileMenu(false);
+            setShowProposalModal(false);
+          }}
+        />
+      )}
+
+      {/* Mobile Menu */}
+      <div className={`mobile-menu ${showMobileMenu ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className="p-4 space-y-2">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id)}
+                className={`w-full flex items-center gap-3 p-4 rounded-lg transition-all duration-300 ${
+                  activeTab === tab.id
+                    ? 'bg-emerald-500/20 text-emerald-400'
+                    : 'hover:bg-emerald-500/10 text-gray-300'
+                }`}
+              >
+                <Icon size={20} />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Proposal Modal */}
+      {showProposalModal && (
+        <div className="modal-content">
+          <div 
+            className="bg-gray-800 rounded-xl p-6 max-w-md w-full" 
+            onClick={e => e.stopPropagation()}
+          >
+            <h3 className="text-xl font-semibold text-emerald-400 mb-4">Active Proposal</h3>
+            <div className="space-y-4">
+              <div className="bg-gray-700/50 rounded-lg p-4">
+                <h4 className="font-medium text-emerald-300 mb-2">Clean Streets & Grow Food</h4>
+                <p className="text-gray-300 text-sm mb-3">
+                  Proposal to clean up local streets and establish community gardens for organic food production.
+                </p>
+                <div className="flex justify-between text-sm text-gray-400">
+                  <span>Support: 89%</span>
+                  <span>Quorum: Yes</span>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button 
+                  className="glass-button flex-1 hover:bg-emerald-500/20"
+                  onClick={() => setShowProposalModal(false)}
+                >
+                  Vote For
+                </button>
+                <button 
+                  className="glass-button flex-1 hover:bg-red-500/20"
+                  onClick={() => setShowProposalModal(false)}
+                >
+                  Vote Against
+                </button>
+              </div>
+            </div>
+            <div className="mt-4 text-center">
+              <button 
+                className="text-gray-400 text-sm hover:text-gray-300"
+                onClick={() => setShowProposalModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default App;
